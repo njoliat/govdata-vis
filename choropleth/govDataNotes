@@ -1,0 +1,196 @@
+data.gov --> professionals --> front-end users
+
+sunlight, code for america, 
+
+{data.gov, sfdata, nyc datamine} --> {sunlight, code for america, nytimes} --> users
+
+
+currently data.gov doesn't list the contributors of the data.
+
+
+agency > subagency > \/\/\ > data
+
+
+existing situation has a 'fundamental flaw': CATALOGS instead of DATA COLLECTIONS
+
+catalogs: 
+
+data collections: 
+
+
+
+endusers could hit our site if data pros write js scripts which hit our api.
+
+
+
+audience: academics + policymakers: expxloration and download for offline analysis
+journalists
+etc
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ec2 address: 50.16.23.214
+
+ssh key signup: 
+http://web.mit.edu/govdata/ssh_signup.html
+
+atadvog
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+root@ec2-50-16-203-228.compute-1.amazonaws.com
+
+chmod a-r id_gd_course
+
+chmod u+r id_gd_course
+
+ssh -i id_gd_course root@ec2-50-16-203-228.compute-1.amazonaws.com
+cd /home/njoliat
+/opt/bin/ipython
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% day 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+csv: not necessarily just commas; csv isn't a specific format but more general.  can also be tab-separated, pipe-separated, etc.
+
+
+ssh -i id_gd_course root@ec2-50-16-230-214.compute-1.amazonaws.com
+cd /home/njoliat
+/opt/bin/ipython
+
+
+SPECIFIC VISUALIZATIONS	
+
+women employees vs. total by industry -- time series
+gov.thedata.org/search?q="women%20employees"&fields=...   [solr syntax for this query]
+
+employment by industry by state == time series + map.
+
+corporate profits, esp. before vs. after taxes.
+
+
+GENERAL VISUALIZATION
+
+making things generally look better, e.g. improving css.
+
+'pivoting' data.  making it 'cool' to do that.
+
+backbackend > parsers > e.g. bea.py contains a bunch of parsers.
+
+
+question: if we're just doing these really standard things (e.g. time series) are we going to be using any canned visualization code
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% specific visualization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+what about: states, how many people in each industry per state
+states, population?  
+
+correlation things: like e.g. income v. politics?  these probably are better done on 2d graphs than on a map.
+
+
+
+>> which industry by state
+
+>> how much women make, compared to total, by state
+
+could do this one, and then see different slices using a slider or something.   that could show us:
+
+>> how much women make, compared to men/or average (by state), by industry
+
+>> how much women make, compared to men / or average (by state), at different years
+
+
+
+for the 'industry by state' one, for eg:
+
+choropleth: how many people in given industry, in each state?
+although maybe what we /really/ want is, for each state, for given industry, how many people in that industry, normalized by [state population OR number of total working employees in that state]
+
+
+if we colored the map by a fraction/ratio: we might want to give the actual numbers somewhere as well.  Could easily show that as a sorted list.  that would be good because it would enable more easy direct comparisons than the map, betw things which are farther away.
+
+divide by total Employment statewide
+
+it would be cute to do like, some kind of food consumed per capita, and use a color pallette taken from the color of that food
+
+
+employment.
+
+filter space by: state
+
+
+
+longitudinal data per state also. 
+basically, pick a state (by clicking it) and you can see a time series
+
+http://vis.stanford.edu/protovis/ex/choropleth.html
+
+
+need to put in collection, i.e. BLS_sm
+
+
+(year) by (xx01-xx12 | xxxx)
+
+not every record has all columns, some records have blanks.
+
+this result set http://50.16.230.214/data?collection=BLS_sm&query={%22Industry%22:%22Employment%20Services%22} you can ctrl+f "Statewide" and there are 36 matches.  So this dataset in general, seems to have results for 36 states.  don't have to use every state, i suppose.
+
+
+(Alabama,01);(Arizona,04);(Connecticut,09);(Delaware,10);(Florida,12);(Illinois,17);(Iowa,19);(Kansas,20);(Maine,23);(Ohio,39);(Pennsylvania,42);(Vermont,50)
+
+^^^ those numbers were FIPS (sp?) numbers.  but we don't need them!  you can also query by states this way:
+"http://50.16.230.214/data?collection=BLS_sm&query={%22Location.s%22:%22Montana%22}"
+that is, using "Location.s":"Montana"
+
+
+note the metadata:
+http://50.16.230.214/metadata?query={%22name%22:%22BLS_sm%22}&fields=[%22name%22,%22metadata.columns%22]
+
+so to query across both, do something like this:
+http://50.16.230.214/data?collection=BLS_sm&query={%22Industry%22:%22Employment%20Services%22,%22Location.s%22:%22Montana%22}
+[^^ "=%22, [space] = %20]
+
+split on comma.
+
+
+ok!  for getting specific columns out of the result sets:  those quoted Integers are the indices of the columns in the metadata.  So, to map an integer column index to the name of that column, do, like, BLS_columns[columnIndex].  BLS_columns is a text file.  Could be better to actually just get the same data (bls column data) from the metadata query, programmatically.  Then the only parsing you need to do is just remove the first part of the text.
+
+
+
+
+1st draft vis:
+
+
+use only current data (year = 2009xxxx).
+
+for industry: pick an industry. ["Industry":"Employment Services"]
+
+just show the employment numbers.  
+
+
+on page load or something, make the http request.  then we have a big string, global var or something.  write a func to grab a year out of that.  
+
+
+
+to do later:
+
+worry about caching / timing of httprequests (need ajax?)
+
+have a slider to select year
+
+divide out by total employment
+
+be able to select among a number of different industries.
+
+
+
+c.name = "Wyoming"
+c.code = "wy"
+
+{jsonp:'onJsonPLoad'} 
+
+dataType = "jsonp"
+
+
+
+some of the jsons are coming back empty.  complaining about a syntax error on ":".
